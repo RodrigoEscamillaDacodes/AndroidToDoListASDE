@@ -11,5 +11,8 @@
     <string name="delete">¿Do you really delete this task?</string>
     <string name="accept">Accept</string>
     <string name="cancel">Cancel</string>
+    <string name="today">Today</string>
+    <string name="completed">Completed</string>
+
 
 </resources>

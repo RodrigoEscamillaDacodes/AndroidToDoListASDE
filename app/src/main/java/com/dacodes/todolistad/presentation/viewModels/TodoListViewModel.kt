@@ -1,34 +1,60 @@
 package com.dacodes.todolistad.presentation.viewModels
 
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dacodes.todolistad.data.repository.TaskRepository
 import com.dacodes.todolistad.model.Task
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
 class TodoListViewModel @Inject constructor(private val taskRepository: TaskRepository): ViewModel() {
 
-    private var _tasks = MutableLiveData<List<Task>>()
-    val tasks : LiveData<List<Task>> get() = _tasks
+    private var _completedList = MutableLiveData<ArrayList<Task>>()
+    val completedList : LiveData<ArrayList<Task>> get() = _completedList
+
+    private var _unCompletedList = MutableLiveData<ArrayList<Task>>()
+    val unCompletedList : LiveData<ArrayList<Task>> get() = _unCompletedList
 
     fun bind(){
-        getTasks()
+        deleteOutDateTasks()
+    }
+
+    private fun deleteOutDateTasks(){
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val current = LocalDateTime.now().format(formatter)
+
+        runBlocking {
+            val result = taskRepository.getTasks()
+
+            result.forEach {
+                if (it.date < current) {
+                    taskRepository.deleteTask(it.id)
+                }
+            }
+
+            getTasks()
+        }
+
+
     }
 
     private fun getTasks(){
         viewModelScope.launch {
-            val result = withContext(Dispatchers.Main){
-                taskRepository.getTasks()
-            }
-            _tasks.value = result
+            _unCompletedList.value = ArrayList(taskRepository.getTasks(false))
+            _completedList.value = ArrayList(taskRepository.getTasks(true))
         }
     }
 
@@ -42,6 +68,7 @@ class TodoListViewModel @Inject constructor(private val taskRepository: TaskRepo
     fun updateTask(task: Task){
         runBlocking {
             taskRepository.updateTask(model = task)
+            getTasks()
         }
     }
 

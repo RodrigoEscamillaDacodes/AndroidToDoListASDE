@@ -1,11 +1,10 @@
 package com.dacodes.todolistad.presentation.adapters
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.dacodes.todolistad.R
 import com.dacodes.todolistad.databinding.TaskItemBinding
@@ -16,7 +15,7 @@ class TasksAdapter(
     private val onClick: OnTaskClickListener,
 ) : RecyclerView.Adapter<BaseViewHolder<*>>(){
 
-    private var list: List<Any> = emptyList()
+    private var list: List<Task> = arrayListOf()
 
     interface OnTaskClickListener{
         fun deleteTask(item: Task)
@@ -29,9 +28,8 @@ class TasksAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
-        return TaskViewHolder(
-            LayoutInflater.from(context).inflate(R.layout.task_item, parent, false)
-        )
+        return TaskViewHolder(LayoutInflater.from(context).inflate(R.layout.task_item, parent, false))
+
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
@@ -52,19 +50,24 @@ class TasksAdapter(
 
                 tvTask.text = item.task
 
-                cbCompleted.isChecked = item.completed
+                tvNumber.text = "${item.priority}"
 
-                var color = when(item.priority){
-                    1-> ContextCompat.getDrawable(context, R.drawable.high)
-                    2-> ContextCompat.getDrawable(context, R.drawable.normal)
-                    3-> ContextCompat.getDrawable(context, R.drawable.low)
-                    else ->  ContextCompat.getDrawable(context, R.drawable.high)
+                if (item.completed){
+                    llPriority.visibility = GONE
                 }
 
-                ivPriority.setImageDrawable(color)
+                tvTask.setOnClickListener {
+                    item.completed = !item.completed
+                    onClick.completedTask(item)
+                }
 
-                cbCompleted.setOnCheckedChangeListener { _, checked ->
-                    item.completed = checked
+                cvParent.setOnClickListener{
+                    item.completed = !item.completed
+                    onClick.completedTask(item)
+                }
+
+                ibCompleted.setOnClickListener {
+                    item.completed = !item.completed
                     onClick.completedTask(item)
                 }
 

@@ -9,5 +9,6 @@ data class Task(
     val id: Int = 0,
     val task: String,
     val priority: Int,
-    var completed: Boolean
+    var completed: Boolean,
+    var date: String
 )

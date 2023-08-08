@@ -15,7 +15,11 @@ class TaskRepository @Inject constructor(private val dbTasks: DBTasks) {
         return dbTasks.taskDAO().getTasks()
     }
 
-    suspend fun deleteTask(taskId: Int){
+    suspend fun getTasks(completed: Boolean) : List<Task>{
+        return dbTasks.taskDAO().getTasksByStatus(completed)
+    }
+
+    suspend fun deleteTask(taskId: Int) {
         dbTasks.taskDAO().deleteTask(taskId)
     }
 

@@ -10,6 +10,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.dacodes.todolistad.R
 import com.dacodes.todolistad.presentation.viewModels.TodoListViewModel
 import com.dacodes.todolistad.databinding.TodoListFragmentBinding
 import com.dacodes.todolistad.model.Task
@@ -23,6 +24,7 @@ class TodoList : Fragment(), TasksAdapter.OnTaskClickListener, BottomSheetFragme
 
     private lateinit var viewModel: TodoListViewModel
     private lateinit var adapter : TasksAdapter
+    private lateinit var adapterUncompleted : TasksAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,32 +40,32 @@ class TodoList : Fragment(), TasksAdapter.OnTaskClickListener, BottomSheetFragme
         viewModel.bind()
 
         viewModel.apply {
-            tasks.observe(requireActivity(), Observer {
+            completedList.observe(requireActivity(), Observer {
                 adapter.setUpList(it)
-                validatePlaceHolder(it.isEmpty())
+            })
+
+            unCompletedList.observe(requireActivity(), Observer {
+                adapterUncompleted.setUpList(it)
             })
         }
 
     }
 
-    private fun validatePlaceHolder(empty: Boolean){
-        binding.apply {
-            if(empty){
-                rvTasks.visibility = GONE
-                ivPlaceholder.visibility = VISIBLE
-            }else{
-                rvTasks.visibility = VISIBLE
-                ivPlaceholder.visibility = GONE
-            }
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = TasksAdapter(requireContext(), this)
+        adapterUncompleted = TasksAdapter(requireContext(), this)
 
         binding.apply {
+
+            binding.inToday.tvSecondary.text = getString(R.string.today)
+            binding.inCompleted.tvSecondary.text = getString(R.string.completed)
+
+            rvUncompletedTasks.layoutManager = LinearLayoutManager(context)
+            rvUncompletedTasks.adapter = adapterUncompleted
+            rvUncompletedTasks.setHasFixedSize(true)
 
             rvTasks.layoutManager = LinearLayoutManager(context)
             rvTasks.adapter = adapter

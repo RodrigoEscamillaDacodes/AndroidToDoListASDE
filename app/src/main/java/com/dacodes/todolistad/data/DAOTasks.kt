@@ -11,6 +11,8 @@ interface DAOTasks {
 
     @Query("SELECT * FROM Task")
     suspend fun getTasks():List<Task>
+    @Query("SELECT * FROM Task WHERE completed = :completed")
+    suspend fun getTasksByStatus(completed: Boolean):List<Task>
 
     @Update(entity = Task::class)
     suspend fun updateTask(model: Task)

@@ -10,7 +10,8 @@ import com.dacodes.todolistad.model.Task
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 class BottomSheetFragment : BottomSheetDialogFragment() {
@@ -53,7 +54,10 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
                 else -> 2
             }
 
-            listener.onAddNewTask(Task(task = task, priority = priority, completed = false))
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val currentDate = LocalDateTime.now().format(formatter)
+
+            listener.onAddNewTask(Task(task = task, priority = priority, completed = false, date = currentDate))
             bottomSheetDialog.dismiss()
         }
     }
