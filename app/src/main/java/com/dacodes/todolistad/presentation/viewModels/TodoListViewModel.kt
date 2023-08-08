@@ -1,19 +1,14 @@
 package com.dacodes.todolistad.presentation.viewModels
 
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dacodes.todolistad.data.repository.TaskRepository
 import com.dacodes.todolistad.model.Task
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -34,13 +29,13 @@ class TodoListViewModel @Inject constructor(private val taskRepository: TaskRepo
     private fun deleteOutDateTasks(){
 
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val current = LocalDateTime.now().format(formatter)
+        val currentDate = LocalDateTime.now().format(formatter)
 
         runBlocking {
             val result = taskRepository.getTasks()
 
             result.forEach {
-                if (it.date < current) {
+                if (it.date < currentDate) {
                     taskRepository.deleteTask(it.id)
                 }
             }
